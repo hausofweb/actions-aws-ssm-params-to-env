@@ -1,15 +1,18 @@
 name: 'AWS SSM parameters to environment variables'
 description: 'load AWS SSM Parameters into environment variables'
 author: 'Bardavon Health Innovations and Denny Biasiolli at IP Sentinel'
+
 branding:
-  icon: 'cloud'
-  color: 'orange'
+  icon: cloud
+  color: orange
+
 inputs:
   ssm-path:
     description: 'AWS SSM path for parameter (eg. `/ssm/parameter`)'
     required: true
   get-children:
-    description: 'Define to get parameters by path, retrieving all children values'
+    description:
+      'Define to get parameters by path, retrieving all children values'
     required: false
   prefix:
     description: 'Set a prefix on the environment variable'
@@ -18,8 +21,10 @@ inputs:
     description: 'Whether the parameter must be decrypted or not'
     required: false
   mask-values:
-    description: 'Indicates if extracted values should be masked in GitHub action logs'
+    description:
+      'Indicates if extracted values should be masked in GitHub Action logs'
     required: false
+
 runs:
-  using: 'node20'
-  main: 'index.js'
+  using: node24
+  main: dist/index.js

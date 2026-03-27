@@ -1,0 +1,67 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript:
+    name: TypeScript Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Get pnpm store directory
+        id: get-pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm cache
+        id: pnpm-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.get-pnpm-store.outputs.STORE_PATH }}
+          key:
+            pnpm-store-${{ runner.os }}-${{ github.workflow }}-${{
+            hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-${{ runner.os }}-${{ github.workflow }}-
+            pnpm-store-${{ runner.os }}-
+
+      - name: Install Dependencies
+        id: install
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Format
+        id: pnpm-format-check
+        run: pnpm run format:check
+
+      - name: Lint
+        id: pnpm-lint
+        run: pnpm run lint
+
+      - name: Test
+        id: pnpm-ci-test
+        run: pnpm run ci-test

@@ -1,0 +1,3 @@
+[codespell]
+ignore-words-list = afterAll,afterall
+skip = pnpm-lock.yaml,*/pnpm-lock.yaml
