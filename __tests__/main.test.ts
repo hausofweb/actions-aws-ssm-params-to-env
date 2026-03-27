@@ -264,6 +264,77 @@ describe('main.ts', () => {
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 
+  it('logs parsed JSON object values for non-secure parameters', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/public-json',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    mockGetParameters.mockResolvedValue([
+      {
+        Name: '/app/public-json',
+        Type: 'String',
+        Value: JSON.stringify({ PUBLIC_URL: 'https://example.com/public' })
+      }
+    ])
+
+    await run_action()
+
+    expect(core.debug).toHaveBeenCalledWith(
+      'parsedValue: {"PUBLIC_URL":"https://example.com/public"}'
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('does not log parsed value when parameter type is missing', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/missing-type',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    const value = 'https://example.com/missing-type'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/missing-type', Value: value }
+    ])
+
+    await run_action()
+
+    expect(core.debug).toHaveBeenCalledWith(
+      'Parsed parameter as string literal value'
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(`parsedValue: ${value}`)
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('does not log parsed value when parameter type is explicitly undefined', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/undefined-type',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    const value = 'https://example.com/undefined-type'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/undefined-type', Type: undefined, Value: value }
+    ])
+
+    await run_action()
+
+    expect(core.debug).toHaveBeenCalledWith(
+      'Parsed parameter as string literal value'
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(`parsedValue: ${value}`)
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
   it('sanitizes JSON object keys before exporting env vars', async () => {
     process.env.AWS_DEFAULT_REGION = 'us-east-1'
     setInputs({

@@ -70,7 +70,8 @@ const exportParameter = (param: Parameter, config: ActionConfig) => {
   }
 
   const parsedValue = parseValue(param.Value)
-  const shouldLogParsedValue = param.Type !== 'SecureString'
+  const shouldLogParsedValue =
+    param.Type != null && param.Type !== 'SecureString'
 
   if (typeof parsedValue === 'object') {
     exportObjectValue(

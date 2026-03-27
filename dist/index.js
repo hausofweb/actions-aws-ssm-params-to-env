@@ -38712,7 +38712,7 @@ const exportParameter = (param, config) => {
         return;
     }
     const parsedValue = parseValue(param.Value);
-    const shouldLogParsedValue = param.Type !== 'SecureString';
+    const shouldLogParsedValue = param.Type != null && param.Type !== 'SecureString';
     if (typeof parsedValue === 'object') {
         exportObjectValue(parsedValue, config.prefix, config.maskValues, shouldLogParsedValue);
         return;
