@@ -6,6 +6,10 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
