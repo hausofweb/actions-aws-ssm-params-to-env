@@ -66,6 +66,53 @@ describe('main.ts', () => {
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 
+  it('uses only the last path segment and sanitizes it when prefix is provided', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/config/database-url',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'false',
+      'mask-values': 'false'
+    })
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/config/database-url', Value: 'postgres://localhost/db' }
+    ])
+
+    await run_action()
+
+    expect(core.exportVariable).toHaveBeenCalledWith(
+      'APP_DATABASE_URL',
+      'postgres://localhost/db'
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('uses only the last path segment and sanitizes it when no prefix is provided', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/config/service.primary-url',
+      'get-children': 'false',
+      prefix: '',
+      decryption: 'false',
+      'mask-values': 'false'
+    })
+    mockGetParameters.mockResolvedValue([
+      {
+        Name: '/app/config/service.primary-url',
+        Value: 'https://example.com'
+      }
+    ])
+
+    await run_action()
+
+    expect(core.exportVariable).toHaveBeenCalledWith(
+      'SERVICE_PRIMARY_URL',
+      'https://example.com'
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
   it('exports JSON object keys and masks values when enabled', async () => {
     process.env.AWS_DEFAULT_REGION = 'us-east-1'
     setInputs({

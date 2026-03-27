@@ -123,7 +123,8 @@ const exportLiteralValue = (
 
 const getPrefixedEnvVarName = (param: Parameter, prefix: string) => {
   const split = param.Name?.split('/')
-  const envVarName = prefix + split?.at(-1)
+  const envVarName =
+    prefix + split?.at(-1)?.replaceAll(/[^\w]/g, '_').toUpperCase()
 
   debug(`Using prefix + end of ssmPath for env var name: ${envVarName}`)
 
@@ -131,7 +132,12 @@ const getPrefixedEnvVarName = (param: Parameter, prefix: string) => {
 }
 
 const getSanitizedEnvVarName = (param: Parameter) => {
-  const envVarName = param.Name?.replaceAll(/[^\W]/g, '_').toUpperCase()
+  // Only use the string after the last '/' in the parameter name, and replace non-alphanumeric characters with underscores to create a valid env var name. For example, /myapp/database-url would become DATABASE_URL
+
+  const envVarName = param.Name?.split('/')
+    .at(-1)
+    ?.replaceAll(/[^\w]/g, '_')
+    .toUpperCase()
 
   debug(
     `No prefix provided, using sanitized parameter name for env var: ${envVarName}`
