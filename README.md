@@ -44,7 +44,8 @@ To use the action, add a step to your workflow using the following syntax:
 ```yaml
 - uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0
   env:
-    AWS_DEFAULT_REGION: us-east-2 # required if not already set by AWS credential configuration
+    # required if not already set by AWS credentials action
+    AWS_DEFAULT_REGION: us-east-2
   with:
     ssm-path: /path/to/parameter # required
     get-children: true # optional, default false
@@ -77,7 +78,7 @@ Boolean which indicates whether the parameter should be decrypted or not.
 Defaults to false.  
 (e.g. `decryption: true`)
 
-_Note: You should take care in utilizing encrypted values, as GitHub actions
+_Note: You should take care in utilizing encrypted values, as GitHub Actions
 will not automatically redact the value of such parameters from your logs. With
 this, it is recommended to also use the
 [mask-values](https://github.com/hausofweb/actions-aws-ssm-params-to-env#mask-values-optional)
@@ -85,7 +86,7 @@ option._
 
 **`mask-values` (optional)**
 
-Boolean which indicates if extracted values should be masked in GitHub action
+Boolean which indicates if extracted values should be masked in GitHub Action
 logs or not. Defaults to false.  
 (e.g. `mask-values: true`)
 
@@ -170,7 +171,7 @@ Using an SSM parameter, `/path/to/parameter`, with the following value:
 }
 ```
 
-the action will set environment variables for you for each key/value pair of the
+the action will set environment variables for you for each key-value pair of the
 JSON:
 
 ```bash
@@ -192,7 +193,7 @@ with the following value:
 }
 ```
 
-the action will set environment variables for you for each key/value pair of the
+the action will set environment variables for you for each key-value pair of the
 JSON, and will prefix each env var name with `TF_VAR_`:
 
 ```bash

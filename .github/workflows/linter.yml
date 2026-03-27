@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         id: setup-node
@@ -43,11 +43,11 @@ jobs:
       - name: Get pnpm store directory
         id: get-pnpm-store
         shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
 
       - name: Restore pnpm cache
         id: pnpm-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ${{ steps.get-pnpm-store.outputs.STORE_PATH }}
           key:
@@ -77,7 +77,7 @@ jobs:
 
       - name: Save pnpm cache
         if: steps.pnpm-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ${{ steps.get-pnpm-store.outputs.STORE_PATH }}
           key:
