@@ -38712,14 +38712,20 @@ const exportParameter = (param, config) => {
         return;
     }
     const parsedValue = parseValue(param.Value);
+    const shouldLogParsedValue = param.Type !== 'SecureString';
     if (typeof parsedValue === 'object') {
-        exportObjectValue(parsedValue, config.prefix, config.maskValues);
+        exportObjectValue(parsedValue, config.prefix, config.maskValues, shouldLogParsedValue);
         return;
     }
-    exportLiteralValue(param, parsedValue, config.prefix, config.maskValues);
+    exportLiteralValue(param, parsedValue, config.prefix, config.maskValues, shouldLogParsedValue);
 };
-const exportObjectValue = (parsedValue, prefix, maskValues) => {
-    debug(`parsedValue: ${JSON.stringify(parsedValue)}`);
+const exportObjectValue = (parsedValue, prefix, maskValues, shouldLogParsedValue) => {
+    if (shouldLogParsedValue) {
+        debug(`parsedValue: ${JSON.stringify(parsedValue)}`);
+    }
+    else {
+        debug(`Parsed parameter as object with ${Object.keys(parsedValue).length} key(s)`);
+    }
     for (const key in parsedValue) {
         const sanitizedKey = sanitizeEnvVarSegment(key);
         setEnvironmentVar({
@@ -38729,8 +38735,13 @@ const exportObjectValue = (parsedValue, prefix, maskValues) => {
         });
     }
 };
-const exportLiteralValue = (param, parsedValue, prefix, maskValues) => {
-    debug(`parsedValue: ${parsedValue}`);
+const exportLiteralValue = (param, parsedValue, prefix, maskValues, shouldLogParsedValue) => {
+    if (shouldLogParsedValue) {
+        debug(`parsedValue: ${parsedValue}`);
+    }
+    else {
+        debug('Parsed parameter as string literal value');
+    }
     const envVarName = prefix
         ? getPrefixedEnvVarName(param, prefix)
         : getSanitizedEnvVarName(param);

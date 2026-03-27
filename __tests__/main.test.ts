@@ -133,7 +133,11 @@ describe('main.ts', () => {
       'mask-values': 'true'
     })
     mockGetParameters.mockResolvedValue([
-      { Name: '/app/json', Value: '{"USER":"alice","PASS":"secret"}' }
+      {
+        Name: '/app/json',
+        Type: 'SecureString',
+        Value: '{"USER":"alice","PASS":"secret"}'
+      }
     ])
 
     await run_action()
@@ -142,6 +146,121 @@ describe('main.ts', () => {
     expect(core.exportVariable).toHaveBeenCalledWith('APP_PASS', 'secret')
     expect(core.setSecret).toHaveBeenCalledWith('alice')
     expect(core.setSecret).toHaveBeenCalledWith('secret')
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('does not log literal parameter values in debug output', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/DB_URL',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'true'
+    })
+    const secretValue = 'postgres://prod-user:prod-pass@example.com/prod'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/DB_URL', Type: 'SecureString', Value: secretValue }
+    ])
+
+    await run_action()
+
+    expect(core.debug).not.toHaveBeenCalledWith(`parsedValue: ${secretValue}`)
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining(secretValue)
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('does not log JSON parameter values in debug output', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/json',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'true'
+    })
+    const secretUser = 'alice'
+    const secretPass = 'secret-pass-value'
+    mockGetParameters.mockResolvedValue([
+      {
+        Name: '/app/json',
+        Type: 'SecureString',
+        Value: JSON.stringify({ USER: secretUser, PASS: secretPass })
+      }
+    ])
+
+    await run_action()
+
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining(secretUser)
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining(secretPass)
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('logs only metadata for parsed parameter values', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/json',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'true'
+    })
+    mockGetParameters.mockResolvedValue([
+      {
+        Name: '/app/json',
+        Type: 'SecureString',
+        Value: JSON.stringify({ USER: 'alice', PASS: 'secret-pass-value' })
+      },
+      {
+        Name: '/app/literal',
+        Type: 'SecureString',
+        Value: 'postgres://prod-user:prod-pass@example.com/prod'
+      }
+    ])
+
+    await run_action()
+
+    expect(core.debug).toHaveBeenCalledWith(
+      'Parsed parameter as object with 2 key(s)'
+    )
+    expect(core.debug).toHaveBeenCalledWith(
+      'Parsed parameter as string literal value'
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining('parsedValue:')
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining('secret-pass-value')
+    )
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining('prod-pass')
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('logs parsed values for non-secure parameters', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/public-url',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    const nonSecretValue = 'https://example.com/public'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/public-url', Type: 'String', Value: nonSecretValue }
+    ])
+
+    await run_action()
+
+    expect(core.debug).toHaveBeenCalledWith(`parsedValue: ${nonSecretValue}`)
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 

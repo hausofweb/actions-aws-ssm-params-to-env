@@ -70,21 +70,40 @@ const exportParameter = (param: Parameter, config: ActionConfig) => {
   }
 
   const parsedValue = parseValue(param.Value)
+  const shouldLogParsedValue = param.Type !== 'SecureString'
 
   if (typeof parsedValue === 'object') {
-    exportObjectValue(parsedValue, config.prefix, config.maskValues)
+    exportObjectValue(
+      parsedValue,
+      config.prefix,
+      config.maskValues,
+      shouldLogParsedValue
+    )
     return
   }
 
-  exportLiteralValue(param, parsedValue, config.prefix, config.maskValues)
+  exportLiteralValue(
+    param,
+    parsedValue,
+    config.prefix,
+    config.maskValues,
+    shouldLogParsedValue
+  )
 }
 
 const exportObjectValue = (
   parsedValue: Record<string, string>,
   prefix: string,
-  maskValues: boolean
+  maskValues: boolean,
+  shouldLogParsedValue: boolean
 ) => {
-  debug(`parsedValue: ${JSON.stringify(parsedValue)}`)
+  if (shouldLogParsedValue) {
+    debug(`parsedValue: ${JSON.stringify(parsedValue)}`)
+  } else {
+    debug(
+      `Parsed parameter as object with ${Object.keys(parsedValue).length} key(s)`
+    )
+  }
 
   for (const key in parsedValue) {
     const sanitizedKey = sanitizeEnvVarSegment(key)
@@ -101,9 +120,14 @@ const exportLiteralValue = (
   param: Parameter,
   parsedValue: string,
   prefix: string,
-  maskValues: boolean
+  maskValues: boolean,
+  shouldLogParsedValue: boolean
 ) => {
-  debug(`parsedValue: ${parsedValue}`)
+  if (shouldLogParsedValue) {
+    debug(`parsedValue: ${parsedValue}`)
+  } else {
+    debug('Parsed parameter as string literal value')
+  }
 
   const envVarName = prefix
     ? getPrefixedEnvVarName(param, prefix)
