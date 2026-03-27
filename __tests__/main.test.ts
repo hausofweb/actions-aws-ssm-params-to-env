@@ -135,6 +135,31 @@ describe('main.ts', () => {
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 
+  it('sanitizes JSON object keys before exporting env vars', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/json',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'false',
+      'mask-values': 'false'
+    })
+    mockGetParameters.mockResolvedValue([
+      {
+        Name: '/app/json',
+        Value: '{"/service/test-parameter":"value"}'
+      }
+    ])
+
+    await run_action()
+
+    expect(core.exportVariable).toHaveBeenCalledWith(
+      'APP__SERVICE_TEST_PARAMETER',
+      'value'
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
   it('uses AWS_DEFAULT_REGION when provided', async () => {
     process.env.AWS_DEFAULT_REGION = 'us-west-2'
     setInputs({

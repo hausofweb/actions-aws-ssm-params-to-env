@@ -87,8 +87,10 @@ const exportObjectValue = (
   debug(`parsedValue: ${JSON.stringify(parsedValue)}`)
 
   for (const key in parsedValue) {
+    const sanitizedKey = sanitizeEnvVarSegment(key)
+
     setEnvironmentVar({
-      key: prefix + key,
+      key: prefix + sanitizedKey,
       value: parsedValue[key],
       maskValue: maskValues
     })
@@ -123,8 +125,7 @@ const exportLiteralValue = (
 
 const getPrefixedEnvVarName = (param: Parameter, prefix: string) => {
   const split = param.Name?.split('/')
-  const envVarName =
-    prefix + split?.at(-1)?.replaceAll(/[^\w]/g, '_').toUpperCase()
+  const envVarName = prefix + sanitizeEnvVarSegment(split?.at(-1))
 
   debug(`Using prefix + end of ssmPath for env var name: ${envVarName}`)
 
@@ -134,16 +135,17 @@ const getPrefixedEnvVarName = (param: Parameter, prefix: string) => {
 const getSanitizedEnvVarName = (param: Parameter) => {
   // Only use the string after the last '/' in the parameter name, and replace non-alphanumeric characters with underscores to create a valid env var name. For example, /myapp/database-url would become DATABASE_URL
 
-  const envVarName = param.Name?.split('/')
-    .at(-1)
-    ?.replaceAll(/[^\w]/g, '_')
-    .toUpperCase()
+  const envVarName = sanitizeEnvVarSegment(param.Name?.split('/').at(-1))
 
   debug(
     `No prefix provided, using sanitized parameter name for env var: ${envVarName}`
   )
 
   return envVarName
+}
+
+const sanitizeEnvVarSegment = (value?: string) => {
+  return value?.replaceAll(/[^\w]/g, '_').toUpperCase()
 }
 
 const getErrorMessage = (error: unknown) => {
