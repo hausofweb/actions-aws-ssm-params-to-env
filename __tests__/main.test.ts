@@ -7,6 +7,7 @@
  */
 import { jest } from '@jest/globals'
 import * as core from '../__fixtures__/core'
+import { ParameterType } from '@aws-sdk/client-ssm'
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule('@actions/core', () => core)
@@ -312,18 +313,22 @@ describe('main.ts', () => {
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 
-  it('does not log parsed value when parameter type is explicitly undefined', async () => {
+  it('does not log parsed value when parameter type is explicitly null', async () => {
     process.env.AWS_DEFAULT_REGION = 'us-east-1'
     setInputs({
-      'ssm-path': '/app/undefined-type',
+      'ssm-path': '/app/null-type',
       'get-children': 'false',
       prefix: 'APP_',
       decryption: 'true',
       'mask-values': 'false'
     })
-    const value = 'https://example.com/undefined-type'
+    const value = 'https://example.com/null-type'
     mockGetParameters.mockResolvedValue([
-      { Name: '/app/undefined-type', Type: undefined, Value: value }
+      {
+        Name: '/app/null-type',
+        Type: null as unknown as ParameterType,
+        Value: value
+      }
     ])
 
     await run_action()
