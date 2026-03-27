@@ -42,7 +42,7 @@ The IAM role that the action assumes **must** have the following permissions:
 To use the action, add a step to your workflow using the following syntax:
 
 ```yaml
-- uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0
+- uses: hausofweb/actions-aws-ssm-params-to-env@v1
   env:
     # required if not already set by AWS credentials action
     AWS_DEFAULT_REGION: us-east-2
@@ -112,7 +112,7 @@ options.
     aws-region: us-east-2
 
 - name: Set SSM Params as Env Vars
-  uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0
+  uses: hausofweb/actions-aws-ssm-params-to-env@v1
   with:
     ssm-path: /path/to/parameter
 ```
@@ -131,7 +131,7 @@ extracted values in the GitHub logs.
     aws-region: us-east-2
 
 - name: Set SSM Params as Env Vars
-  uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0
+  uses: hausofweb/actions-aws-ssm-params-to-env@v1
   with:
     ssm-path: /path/to/parameter
     get-children: true
@@ -147,7 +147,7 @@ recommended).
 
 ```yaml
 - name: Set SSM Params as Env Vars
-  uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0
+  uses: hausofweb/actions-aws-ssm-params-to-env@v1
   env:
     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
