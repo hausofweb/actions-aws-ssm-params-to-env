@@ -29,12 +29,22 @@ const setInputs = (inputs: Record<string, string>) => {
 }
 
 describe('main.ts', () => {
+  const originalAwsDefaultRegion = process.env.AWS_DEFAULT_REGION
+
   beforeEach(() => {
     delete process.env.AWS_DEFAULT_REGION
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  afterAll(() => {
+    if (originalAwsDefaultRegion === undefined) {
+      delete process.env.AWS_DEFAULT_REGION
+    } else {
+      process.env.AWS_DEFAULT_REGION = originalAwsDefaultRegion
+    }
   })
 
   it('exports plain parameter values using prefix', async () => {
