@@ -1,6 +1,6 @@
-name: 'AWS SSM parameters to environment variables'
-description: 'load AWS SSM Parameters into environment variables'
-author: 'Bardavon Health Innovations and Denny Biasiolli at IP Sentinel'
+name: 'AWS SSM Parameters to Env Variables'
+description: 'Load AWS SSM Parameters into the session environment variables'
+author: 'Haus of Web'
 
 branding:
   icon: cloud
