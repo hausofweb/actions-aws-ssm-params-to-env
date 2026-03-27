@@ -68,7 +68,7 @@ jobs:
               exit 1
             fi
 
-            echo "[OK] ${var_name}=${actual_value}"
+            echo "[OK] ${var_name} is set correctly"
           }
 
           assert_env_var "APPLICATION_URL" "https://api.com"
