@@ -37,7 +37,7 @@ describe('main.ts', () => {
     jest.resetAllMocks()
   })
 
-  it('exports plain parameter values using suffix and prefix', async () => {
+  it('exports plain parameter values using prefix', async () => {
     process.env.AWS_DEFAULT_REGION = 'us-east-1'
     setInputs({
       'ssm-path': '/app/DB_URL',
@@ -110,23 +110,6 @@ describe('main.ts', () => {
   })
 
   it('sets failed status when AWS_DEFAULT_REGION is not set', async () => {
-    setInputs({
-      'ssm-path': '/app/DB_URL',
-      'get-children': 'false',
-      prefix: '',
-      decryption: 'false',
-      'mask-values': 'false'
-    })
-
-    await run_action()
-
-    expect(core.setFailed).toHaveBeenCalledWith(
-      'AWS region must be specified via AWS_DEFAULT_REGION environment variable'
-    )
-    expect(mockGetParameters).not.toHaveBeenCalled()
-  })
-
-  it('sets failed status when region is missing', async () => {
     setInputs({
       'ssm-path': '/app/DB_URL',
       'get-children': 'false',

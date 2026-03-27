@@ -14,7 +14,7 @@ this action detailed below.
 
 ## Prerequisites
 
-​To use this action, you first need to configure AWS credentials and set the AWS
+To use this action, you first need to configure AWS credentials and set the AWS
 Region in your GitHub environment by using the `configure-aws-credentials` step.
 _Note that the `configure-aws-credentials` action will also set the AWS Region
 in your job's environment, so you will not need to pass it to the
@@ -39,7 +39,7 @@ The IAM role that the action assumes **must** have the following permissions:
 
 ## Usage
 
-​ To use the action, add a step to your workflow using the following syntax:
+To use the action, add a step to your workflow using the following syntax:
 
 ```yaml
 - uses: hausofweb/actions-aws-ssm-params-to-env@v1.4.0

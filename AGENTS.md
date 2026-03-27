@@ -5,9 +5,10 @@ the TypeScript sources and the **generated** JavaScript code are contained in
 this repository. The TypeScript sources are contained in the `src` directory and
 the JavaScript code is contained in the `dist` directory. A GitHub Actions
 workflow checks that the JavaScript code in `dist` is up-to-date. Therefore, you
-should not review any changes to the contents of the `dist` folder and it is
-expected that the JavaScript code in `dist` closely mirrors the TypeScript code
-it is generated from.
+should focus review on `src` and validate that `dist` is generated and CI-
+verified. It is expected that the JavaScript code in `dist` closely mirrors the
+TypeScript code it is generated from, but executable artifacts in `dist` may
+still require targeted review when they are committed.
 
 ## Repository Structure
 

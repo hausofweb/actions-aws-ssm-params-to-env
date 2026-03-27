@@ -57,10 +57,6 @@ jobs:
             pnpm-store-${{ runner.os }}-${{ github.workflow }}-
             pnpm-store-${{ runner.os }}-
 
-      - name: Install Dependencies
-        id: install
-        run: pnpm install --frozen-lockfile
-
       - name: Lint Codebase
         id: super-linter
         uses: super-linter/super-linter/slim@v8
