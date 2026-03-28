@@ -38712,12 +38712,16 @@ const exportParameter = (param, config) => {
         return;
     }
     const parsedValue = parseValue(param.Value);
-    const shouldLogParsedValue = param.Type != null && param.Type !== 'SecureString';
+    const shouldMaskExportedValue = config.maskValues || isSecureStringParameter(param);
+    const shouldLogParsedValue = param.Type != null && !isSecureStringParameter(param);
     if (typeof parsedValue === 'object') {
-        exportObjectValue(parsedValue, config.prefix, config.maskValues, shouldLogParsedValue);
+        exportObjectValue(parsedValue, config.prefix, shouldMaskExportedValue, shouldLogParsedValue);
         return;
     }
-    exportLiteralValue(param, parsedValue, config.prefix, config.maskValues, shouldLogParsedValue);
+    exportLiteralValue(param, parsedValue, config.prefix, shouldMaskExportedValue, shouldLogParsedValue);
+};
+const isSecureStringParameter = (param) => {
+    return param.Type === 'SecureString';
 };
 const exportObjectValue = (parsedValue, prefix, maskValues, shouldLogParsedValue) => {
     if (shouldLogParsedValue) {

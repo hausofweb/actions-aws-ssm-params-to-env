@@ -87,7 +87,8 @@ option._
 **`mask-values` (optional)**
 
 Boolean which indicates if extracted values should be masked in GitHub Action
-logs or not. Defaults to false.  
+logs or not. Defaults to false for non-secure parameters. Values sourced from
+`SecureString` parameters are always masked.  
 (e.g. `mask-values: true`)
 
 **`prefix` (optional)**
