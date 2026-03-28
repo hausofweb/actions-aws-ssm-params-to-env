@@ -1,3 +1,6 @@
+/// <reference types="jest" />
+/// <reference types="node" />
+
 /**
  * Unit tests for the action's main functionality, src/main.ts
  *
@@ -200,6 +203,51 @@ describe('main.ts', () => {
     expect(core.debug).not.toHaveBeenCalledWith(
       expect.stringContaining(secretPass)
     )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('masks secure string values when mask-values is false', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/secret-url',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    const secretValue = 'postgres://prod-user:prod-pass@example.com/prod'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/secret-url', Type: 'SecureString', Value: secretValue }
+    ])
+
+    await run_action()
+
+    expect(core.setSecret).toHaveBeenCalledWith(secretValue)
+    expect(core.debug).not.toHaveBeenCalledWith(`parsedValue: ${secretValue}`)
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining(secretValue)
+    )
+    expect(core.setFailed).not.toHaveBeenCalled()
+  })
+
+  it('does not mask non-secure values when mask-values is false', async () => {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    setInputs({
+      'ssm-path': '/app/public-url',
+      'get-children': 'false',
+      prefix: 'APP_',
+      decryption: 'true',
+      'mask-values': 'false'
+    })
+    const publicValue = 'https://example.com/public'
+    mockGetParameters.mockResolvedValue([
+      { Name: '/app/public-url', Type: 'String', Value: publicValue }
+    ])
+
+    await run_action()
+
+    expect(core.setSecret).not.toHaveBeenCalled()
+    expect(core.debug).toHaveBeenCalledWith(`parsedValue: ${publicValue}`)
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 

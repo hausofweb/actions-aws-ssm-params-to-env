@@ -70,14 +70,16 @@ const exportParameter = (param: Parameter, config: ActionConfig) => {
   }
 
   const parsedValue = parseValue(param.Value)
+  const shouldMaskExportedValue =
+    config.maskValues || isSecureStringParameter(param)
   const shouldLogParsedValue =
-    param.Type != null && param.Type !== 'SecureString'
+    param.Type != null && !isSecureStringParameter(param)
 
   if (typeof parsedValue === 'object') {
     exportObjectValue(
       parsedValue,
       config.prefix,
-      config.maskValues,
+      shouldMaskExportedValue,
       shouldLogParsedValue
     )
     return
@@ -87,9 +89,17 @@ const exportParameter = (param: Parameter, config: ActionConfig) => {
     param,
     parsedValue,
     config.prefix,
-    config.maskValues,
+    shouldMaskExportedValue,
     shouldLogParsedValue
   )
+}
+
+/**
+ * Returns true when an SSM parameter should be treated as sensitive.
+ * Centralizing this check keeps masking and logging rules consistent.
+ */
+const isSecureStringParameter = (param: Parameter): boolean => {
+  return param.Type === 'SecureString'
 }
 
 const exportObjectValue = (
