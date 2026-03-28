@@ -26,6 +26,8 @@ export default [
     'plugin:prettier/recommended'
   ),
   {
+    files: ['**/*.ts'],
+
     plugins: {
       jest,
       prettier,
@@ -45,15 +47,7 @@ export default [
       sourceType: 'module',
 
       parserOptions: {
-        projectService: {
-          allowDefaultProject: [
-            '__fixtures__/*.ts',
-            '__tests__/*.ts',
-            'eslint.config.mjs',
-            'jest.config.js',
-            'rollup.config.ts'
-          ]
-        },
+        project: ['./tsconfig.json', './tsconfig.test.json'],
         tsconfigRootDir: import.meta.dirname
       }
     },

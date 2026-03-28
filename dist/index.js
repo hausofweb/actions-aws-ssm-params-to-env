@@ -38720,6 +38720,10 @@ const exportParameter = (param, config) => {
     }
     exportLiteralValue(param, parsedValue, config.prefix, shouldMaskExportedValue, shouldLogParsedValue);
 };
+/**
+ * Returns true when an SSM parameter should be treated as sensitive.
+ * Centralizing this check keeps masking and logging rules consistent.
+ */
 const isSecureStringParameter = (param) => {
     return param.Type === 'SecureString';
 };

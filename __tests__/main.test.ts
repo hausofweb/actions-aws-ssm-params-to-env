@@ -1,3 +1,6 @@
+/// <reference types="jest" />
+/// <reference types="node" />
+
 /**
  * Unit tests for the action's main functionality, src/main.ts
  *
@@ -221,6 +224,9 @@ describe('main.ts', () => {
 
     expect(core.setSecret).toHaveBeenCalledWith(secretValue)
     expect(core.debug).not.toHaveBeenCalledWith(`parsedValue: ${secretValue}`)
+    expect(core.debug).not.toHaveBeenCalledWith(
+      expect.stringContaining(secretValue)
+    )
     expect(core.setFailed).not.toHaveBeenCalled()
   })
 
